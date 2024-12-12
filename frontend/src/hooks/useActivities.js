@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { activityCategories } from "../components";
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 const useActivities = () => {
   const [movies, setMovies] = useState([]);
   const [tvShows, setTvShows] = useState([]);
@@ -18,15 +20,9 @@ const useActivities = () => {
   useEffect(() => {
     const fetchAllActivities = async () => {
       try {
-        setMovies(
-          await fetchActivities("http://localhost:5000/api/movies", "movies")
-        );
-        setTvShows(
-          await fetchActivities("http://localhost:5000/api/tvshows", "TV shows")
-        );
-        setGames(
-          await fetchActivities("http://localhost:5000/api/games", "games")
-        );
+        setMovies(await fetchActivities(`${API_URL}/movies`, "movies"));
+        setTvShows(await fetchActivities(`${API_URL}/tvshows`, "TV shows"));
+        setGames(await fetchActivities(`${API_URL}/games`, "games"));
       } catch (error) {
         setError(error.message);
       } finally {
@@ -41,7 +37,7 @@ const useActivities = () => {
   const addActivity = async (title, category) => {
     if (title.trim()) {
       try {
-        const response = await fetch(`http://localhost:5000/api/${category}`, {
+        const response = await fetch(`${API_URL}/${category}`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -83,7 +79,7 @@ const useActivities = () => {
     };
 
     try {
-      const response = await fetch("http://localhost:5000/api/activities", {
+      const response = await fetch(`${API_URL}/activities`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
