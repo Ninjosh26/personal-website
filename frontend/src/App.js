@@ -10,7 +10,7 @@ export default function App() {
         <Navbar />
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="activities" element={<ActivityChoices />} />
+          <Route path="/activities" element={<ActivityChoices />} />
         </Routes>
       </BrowserRouter>
     </div>
