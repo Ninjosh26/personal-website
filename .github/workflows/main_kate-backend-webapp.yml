@@ -23,6 +23,7 @@ jobs:
 
       - name: npm install, build, and test
         run: |
+          cd backend
           npm install
           npm run build --if-present
           npm run test --if-present
@@ -59,4 +60,4 @@ jobs:
           app-name: 'kate-backend-webapp'
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_6A9F18492748443CA0B6101CC3D84995 }}
-          package: .
+          package: ./backend
