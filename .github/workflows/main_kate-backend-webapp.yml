@@ -11,7 +11,7 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
@@ -27,12 +27,17 @@ jobs:
           npm install
           npm run build --if-present
           npm run test --if-present
-      
+
+      - name: Zip artifact for deployment
+        run: |
+          cd backend
+          zip release.zip ./* -r
+
       - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: node-app
-          path: .
+          path: backend/release.zip
 
   deploy:
     runs-on: ubuntu-latest
@@ -40,27 +45,21 @@ jobs:
     environment:
       name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-    permissions:
-      id-token: write #This is required for requesting the JWT
 
     steps:
       - name: Download artifact from build job
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v3
         with:
           name: node-app
-      
-      - name: Login to Azure
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_9C9AB1D47B25440E8D1BB619C08B6346 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_2FA108C458914CBD8453D2C66CBDA73C }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_36FA31A892B14C1290CB94C119344ADB }}
+
+      - name: Unzip artifact for deployment
+        run: unzip release.zip
 
       - name: 'Deploy to Azure Web App'
-        uses: azure/webapps-deploy@v3
         id: deploy-to-webapp
+        uses: azure/webapps-deploy@v2
         with:
           app-name: 'kate-backend-webapp'
           slot-name: 'Production'
-          package: ./backend
-          
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_6A9F18492748443CA0B6101CC3D84995 }}
+          package: ./
