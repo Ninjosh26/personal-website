@@ -2,15 +2,8 @@ import { ActivityOptions } from "../components";
 import useActivities from "../hooks/useActivities";
 
 export default function ActivityChoices() {
-  const {
-    movies,
-    tvShows,
-    games,
-    loading,
-    error,
-    addActivity,
-    deleteActivities,
-  } = useActivities();
+  const { movies, tvShows, games, addActivity, deleteActivities } =
+    useActivities();
 
   return (
     <div style={{ paddingLeft: "20px", paddingRight: "20px" }}>
