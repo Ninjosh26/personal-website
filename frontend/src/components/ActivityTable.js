@@ -1,4 +1,5 @@
 import {
+  Box,
   Checkbox,
   IconButton,
   Paper,
@@ -10,9 +11,12 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TableSortLabel,
   Tooltip,
 } from "@mui/material";
+import { visuallyHidden } from "@mui/utils";
 import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
+import { useState } from "react";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -33,6 +37,37 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
+const StyledTableSortLabel = styled(TableSortLabel)(({ theme }) => ({
+  color: theme.palette.common.white,
+  "&.Mui-active": {
+    color: theme.palette.common.white,
+  },
+  "&:hover": {
+    color: theme.palette.common.white,
+  },
+  "& .MuiTableSortLabel-icon": {
+    color: theme.palette.common.white,
+  },
+  "&.Mui-active .MuiTableSortLabel-icon": {
+    color: theme.palette.common.white,
+  },
+}));
+
+function descendingComparator(a, b, orderBy) {
+  if (b[orderBy] < a[orderBy]) {
+    return -1;
+  } else if (b[orderBy] > a[orderBy]) {
+    return 1;
+  }
+  return 0;
+}
+
+function getComparator(order, orderBy) {
+  return order === "desc"
+    ? (a, b) => descendingComparator(a, b, orderBy)
+    : (a, b) => descendingComparator(b, a, orderBy);
+}
+
 export default function ActivityTable({
   activities,
   category,
@@ -41,6 +76,9 @@ export default function ActivityTable({
   handleSelectAll,
   handleEdit,
 }) {
+  const [order, setOrder] = useState("asc");
+  const [orderBy, setOrderBy] = useState(null);
+
   const prettyTimestamp = (timestamp) => {
     const date = new Date(timestamp);
     const options = {
@@ -52,6 +90,12 @@ export default function ActivityTable({
       timeZoneName: "short",
     };
     return date.toLocaleString("en-US", options);
+  };
+
+  const handleSort = (event, property) => {
+    const isAsc = orderBy === property && order === "asc";
+    setOrder(isAsc ? "desc" : "asc");
+    setOrderBy(property);
   };
 
   return (
@@ -91,44 +135,99 @@ export default function ActivityTable({
                 />
               </Tooltip>
             </StyledTableCell>
-            <StyledTableCell>Name</StyledTableCell>
-            <StyledTableCell align="center">Date Added</StyledTableCell>
-            <StyledTableCell align="center">Last Updated</StyledTableCell>
+            <StyledTableCell
+              sortDirection={orderBy === "Title" ? order : false}
+            >
+              <StyledTableSortLabel
+                active={orderBy === "Title"}
+                direction={orderBy === "Title" ? order : "asc"}
+                onClick={(event) => handleSort(event, "Title")}
+              >
+                Name
+                {orderBy === "Title" ? (
+                  <Box component="span" sx={visuallyHidden}>
+                    {order === "desc"
+                      ? "sorted-descending"
+                      : "sorted-ascending"}
+                  </Box>
+                ) : null}
+              </StyledTableSortLabel>
+            </StyledTableCell>
+            <StyledTableCell
+              align="center"
+              sortDirection={orderBy === "CreatedAt" ? order : false}
+            >
+              <StyledTableSortLabel
+                active={orderBy === "CreatedAt"}
+                direction={orderBy === "CreatedAt" ? order : "asc"}
+                onClick={(event) => handleSort(event, "CreatedAt")}
+              >
+                Date Added
+                {orderBy === "CreatedAt" ? (
+                  <Box component="span" sx={visuallyHidden}>
+                    {order === "desc"
+                      ? "sorted-descending"
+                      : "sorted-ascending"}
+                  </Box>
+                ) : null}
+              </StyledTableSortLabel>
+            </StyledTableCell>
+            <StyledTableCell
+              align="center"
+              sortDirection={orderBy === "UpdatedAt" ? order : false}
+            >
+              <StyledTableSortLabel
+                active={orderBy === "UpdatedAt"}
+                direction={orderBy === "UpdatedAt" ? order : "asc"}
+                onClick={(event) => handleSort(event, "UpdatedAt")}
+              >
+                Last Updated
+                {orderBy === "UpdatedAt" ? (
+                  <Box component="span" sx={visuallyHidden}>
+                    {order === "desc"
+                      ? "sorted-descending"
+                      : "sorted-ascending"}
+                  </Box>
+                ) : null}
+              </StyledTableSortLabel>
+            </StyledTableCell>
             <StyledTableCell align="center">Edit</StyledTableCell>
           </StyledTableRow>
         </TableHead>
         <TableBody sx={{ maxHeight: "70vh" }}>
-          {activities.map((activity, idx) => (
-            <StyledTableRow
-              key={idx}
-              sx={{ "& > *": { borderBottom: "unset" } }}
-            >
-              <StyledTableCell>
-                <Checkbox
-                  edge="start"
-                  onChange={() => handleSelectClick(category, idx)}
-                  checked={selected[category].includes(idx)}
-                />
-              </StyledTableCell>
-              <StyledTableCell component="th" scope="row">
-                {activity.Title}
-              </StyledTableCell>
-              <StyledTableCell align="center">
-                {prettyTimestamp(activity.CreatedAt)}
-              </StyledTableCell>
-              <StyledTableCell align="center">
-                {prettyTimestamp(activity.UpdatedAt)}
-              </StyledTableCell>
-              <StyledTableCell align="center">
-                <IconButton
-                  sx={{ backgroundColor: "#d7e7ff", borderRadius: "5px" }}
-                  onClick={() => handleEdit(activity, category)}
-                >
-                  <DriveFileRenameOutlineIcon sx={{ color: "black" }} />
-                </IconButton>
-              </StyledTableCell>
-            </StyledTableRow>
-          ))}
+          {activities
+            .sort(getComparator(order, orderBy))
+            .map((activity, idx) => (
+              <StyledTableRow
+                key={idx}
+                sx={{ "& > *": { borderBottom: "unset" } }}
+              >
+                <StyledTableCell>
+                  <Checkbox
+                    edge="start"
+                    onChange={() => handleSelectClick(category, idx)}
+                    checked={selected[category].includes(idx)}
+                  />
+                </StyledTableCell>
+                <StyledTableCell component="th" scope="row">
+                  {activity.Title}
+                </StyledTableCell>
+                <StyledTableCell align="center">
+                  {prettyTimestamp(activity.CreatedAt)}
+                </StyledTableCell>
+                <StyledTableCell align="center">
+                  {prettyTimestamp(activity.UpdatedAt)}
+                </StyledTableCell>
+                <StyledTableCell align="center">
+                  <IconButton
+                    sx={{ backgroundColor: "#d7e7ff", borderRadius: "5px" }}
+                    onClick={() => handleEdit(activity, category)}
+                  >
+                    <DriveFileRenameOutlineIcon sx={{ color: "black" }} />
+                  </IconButton>
+                </StyledTableCell>
+              </StyledTableRow>
+            ))}
         </TableBody>
       </Table>
     </TableContainer>

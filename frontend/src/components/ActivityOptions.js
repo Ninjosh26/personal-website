@@ -95,7 +95,6 @@ export default function ActivityOptions({
           ? handleSelectArray(selected.games)
           : selected.games,
     };
-    console.log(newSelected);
 
     setSelected(newSelected);
   };
@@ -160,8 +159,6 @@ export default function ActivityOptions({
         },
       ];
 
-      console.log("UPDATED:", updated);
-
       return updated;
     });
 
@@ -169,9 +166,6 @@ export default function ActivityOptions({
   };
 
   const handleUpdate = (id, category, fields) => {
-    console.log("ID:", id);
-    console.log("CATEGORY:", category);
-    console.log("FIELDS:", fields);
     const updateFields = {};
 
     fields.forEach((field) => {
@@ -281,7 +275,7 @@ export default function ActivityOptions({
               marginBottom: "4px",
             }}
           >
-            Movies
+            {`Movies (${movies.length})`}
           </h2>
         </div>
         <ActivityTable
@@ -303,7 +297,7 @@ export default function ActivityOptions({
               marginBottom: "4px",
             }}
           >
-            TV Shows
+            {`TV Shows (${tvShows.length})`}
           </h2>
         </div>
         <ActivityTable
@@ -312,7 +306,7 @@ export default function ActivityOptions({
           selected={selected}
           handleSelectClick={handleSelectClick}
           handleSelectAll={handleSelectAll}
-          handleEdit={() => handleEdit()}
+          handleEdit={handleEdit}
         />
       </div>
       <div style={{ marginTop: "20px" }}>
@@ -325,7 +319,7 @@ export default function ActivityOptions({
               marginBottom: "4px",
             }}
           >
-            Games
+            {`Games (${games.length})`}
           </h2>
         </div>
         <ActivityTable
@@ -334,7 +328,7 @@ export default function ActivityOptions({
           selected={selected}
           handleSelectClick={handleSelectClick}
           handleSelectAll={handleSelectAll}
-          handleEdit={() => {}}
+          handleEdit={handleEdit}
         />
       </div>
       <ConfirmDialog
