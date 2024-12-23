@@ -23,26 +23,26 @@ export default function RandomizerDialog({
   onClose,
 }) {
   const randomizeSelection = () => {
-    console.log("SELECTED:", selected);
     const totalSelected =
       selected.movies.length + selected.tvShows.length + selected.games.length;
-    console.log("TOTAL SELECTED:", totalSelected);
     if (totalSelected > 0) {
       const randomNum = Math.floor(Math.random() * totalSelected);
       let randomItem;
-
-      console.log("RANDOM NUM:", randomNum);
+      let category;
 
       if (randomNum < selected.movies.length) {
         randomItem = movies[selected.movies[randomNum]];
+        category = "MOVIE";
       } else if (randomNum < selected.movies.length + selected.tvShows.length) {
         randomItem =
           tvShows[selected.tvShows[randomNum - selected.movies.length]];
+        category = "TV SHOW";
       } else {
         randomItem = games[selected.games[totalSelected - randomNum - 1]];
+        category = "GAME";
       }
 
-      alert(`Randomly selected item: ${randomItem.Title}`);
+      alert(`Randomly selected ${category}: ${randomItem.Title}`);
     } else {
       alert("No items selected!");
     }
