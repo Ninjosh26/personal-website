@@ -35,10 +35,10 @@ app.post("/api/movies", async (req, res) => {
     const pool = await getConnection();
     const result = await pool.request().input("Title", sql.NVarChar, Title)
       .query(`
-        DECLARE @InsertedRecord TABLE (MovieId INT, Title NVARCHAR(128), CreatedAt DATETIME2);
+        DECLARE @InsertedRecord TABLE (MovieId INT, Title NVARCHAR(128), CreatedAt DATETIME2, UpdatedAt DATETIME2);
 
         INSERT INTO Movies (Title)
-        OUTPUT inserted.MovieId, inserted.Title, inserted.CreatedAt INTO @InsertedRecord
+        OUTPUT inserted.MovieId, inserted.Title, inserted.CreatedAt, inserted.UpdatedAt INTO @InsertedRecord
         VALUES (@Title);
 
         SELECT * FROM @InsertedRecord;
@@ -48,6 +48,45 @@ app.post("/api/movies", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Error adding Movie to database" });
+  }
+});
+
+// Route to update a movie
+app.put("/api/movies/:id", async (req, res) => {
+  const id = req.params.id;
+  const updatedMovie = req.body;
+
+  if (!Object.keys(updatedMovie).length) {
+    return res.status(400).json({ message: "No fields provided to update" });
+  }
+
+  try {
+    const pool = await getConnection();
+
+    // Dynamically build SET clause
+    const updates = Object.keys(updatedMovie)
+      .map((key, index) => `${key} = @value${index}`)
+      .join(", ");
+
+    const request = await pool.request().input("id", id);
+
+    // Bind the previous fields from the request body
+    Object.keys(updatedMovie).forEach((key, index) => {
+      request.input(`value${index}`, updatedMovie[key]);
+    });
+
+    // Execute the query
+    const result = await request.query(
+      `UPDATE Movies SET ${updates}, UpdatedAt = SYSDATETIME() WHERE MovieId = @id`
+    );
+
+    if (result.rowsAffected[0] > 0) {
+      res.status(200).json({ message: "Movie updated successfully" });
+    } else {
+      res.status(404).json({ message: "Movie not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Error updating movie", error });
   }
 });
 
@@ -92,6 +131,45 @@ app.post("/api/tvshows", async (req, res) => {
   }
 });
 
+// Route to update a TV Show
+app.put("/api/tvshows/:id", async (req, res) => {
+  const id = req.params.id;
+  const updatedTvShow = req.body;
+
+  if (!Object.keys(updatedTvShow).length) {
+    return res.status(400).json({ message: "No fields provided to update" });
+  }
+
+  try {
+    const pool = await getConnection();
+
+    // Dynamically build SET clause
+    const updates = Object.keys(updatedMovie)
+      .map((key, index) => `${key} = @value${index}`)
+      .join(", ");
+
+    const request = await pool.request().input("id", id);
+
+    // Bind the previous fields from the request body
+    Object.keys(updatedTvShow).forEach((key, index) => {
+      request.input(`value${index}`, updatedTvShow[key]);
+    });
+
+    // Execute the query
+    const result = await request.query(
+      `UPDATE TVShows SET ${updates}, UpdatedAt = SYSDATETIME() WHERE TVShowId = @id`
+    );
+
+    if (result.rowsAffected[0] > 0) {
+      res.status(200).json({ message: "TV show updated successfully" });
+    } else {
+      res.status(404).json({ message: "TV show not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Error updating TV show", error });
+  }
+});
+
 // Route to get Games
 app.get("/api/games", async (req, res) => {
   try {
@@ -130,6 +208,45 @@ app.post("/api/games", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Error adding game to database" });
+  }
+});
+
+// Route to update a game
+app.put("/api/games/:id", async (req, res) => {
+  const id = req.params.id;
+  const updatedGame = req.body;
+
+  if (!Object.keys(updatedGame).length) {
+    return res.status(400).json({ message: "No fields provided to update" });
+  }
+
+  try {
+    const pool = await getConnection();
+
+    // Dynamically build SET clause
+    const updates = Object.keys(updatedMovie)
+      .map((key, index) => `${key} = @value${index}`)
+      .join(", ");
+
+    const request = await pool.request().input("id", id);
+
+    // Bind the previous fields from the request body
+    Object.keys(updatedGame).forEach((key, index) => {
+      request.input(`value${index}`, updatedGame[key]);
+    });
+
+    // Execute the query
+    const result = await request.query(
+      `UPDATE Games SET ${updates}, UpdatedAt = SYSDATETIME() WHERE GameId = @id`
+    );
+
+    if (result.rowsAffected[0] > 0) {
+      res.status(200).json({ message: "Game updated successfully" });
+    } else {
+      res.status(404).json({ message: "Game not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Error updating game", error });
   }
 });
 

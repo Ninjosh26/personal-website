@@ -1,14 +1,9 @@
 import { useState } from "react";
 import {
   Button,
-  Checkbox,
   FormControl,
   FormHelperText,
   IconButton,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
   MenuItem,
   Select,
   TextField,
@@ -20,6 +15,8 @@ import DeleteIcon from "@mui/icons-material/Delete";
 
 import ConfirmDialog from "./ConfirmDialog";
 import RandomizerDialog from "./RandomizerDialog";
+import ActivityTable from "./ActivityTable";
+import EditDialog from "./EditDialog";
 
 export const activityCategories = {
   movies: "movies",
@@ -32,6 +29,7 @@ export default function ActivityOptions({
   tvShows,
   games,
   addItem,
+  updateItem,
   deleteItems,
 }) {
   const [newValue, setNewValue] = useState("");
@@ -45,6 +43,12 @@ export default function ActivityOptions({
   });
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
   const [randomizerOpen, setRandomizerOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+  const [editProps, setEditProps] = useState({
+    id: 0,
+    category: "",
+    fields: [],
+  });
 
   const internalAddItem = () => {
     addItem(newValue, selectedCategory);
@@ -136,6 +140,50 @@ export default function ActivityOptions({
     }));
   };
 
+  const handleEdit = (activity, category) => {
+    setEditProps((prevProps) => {
+      const updated = { ...prevProps };
+
+      if (category === "movies") {
+        updated.id = activity.MovieId;
+      } else if (category === "tvShows") {
+        updated.id = activity.TVShowId;
+      } else if (category === "games") {
+        updated.id = activity.GameId;
+      }
+
+      updated.category = category;
+      updated.fields = [
+        {
+          label: "Title",
+          value: activity.Title,
+        },
+      ];
+
+      console.log("UPDATED:", updated);
+
+      return updated;
+    });
+
+    setEditOpen(true);
+  };
+
+  const handleUpdate = (id, category, fields) => {
+    console.log("ID:", id);
+    console.log("CATEGORY:", category);
+    console.log("FIELDS:", fields);
+    const updateFields = {};
+
+    fields.forEach((field) => {
+      if (field.label === "Title") {
+        updateFields.Title = field.value.trim();
+      }
+    });
+
+    updateItem(id, category, updateFields);
+    setEditOpen(false);
+  };
+
   return (
     <div style={{ padding: 20 }}>
       <div style={{ display: "flex", gap: "20px" }}>
@@ -225,30 +273,6 @@ export default function ActivityOptions({
       </div>
       <div style={{ marginTop: "20px" }}>
         <div style={{ display: "flex", marginBottom: "5px" }}>
-          <Checkbox
-            edge="start"
-            indeterminate={
-              selected.movies.length > 0 &&
-              selected.movies.length < movies.length
-            }
-            checked={
-              movies.length > 0 && selected.movies.length === movies.length
-            }
-            onChange={(event) => handleSelectAll(event, "movies")}
-            sx={{
-              color: "white",
-              fontSize: "24px",
-              paddingY: "0px",
-              paddingLeft: "10px",
-              paddingRight: "8px",
-              "&.Mui-checked": {
-                color: "#CDDC39",
-              },
-              "&.MuiCheckbox-indeterminate": {
-                color: "#CDDC39",
-              },
-            }}
-          />
           <h2
             style={{
               color: "white",
@@ -260,55 +284,17 @@ export default function ActivityOptions({
             Movies
           </h2>
         </div>
-        <List
-          style={{
-            backgroundColor: "#f4f4f9",
-            borderRadius: "8px",
-            padding: "10px",
-          }}
-        >
-          {movies.map((movie, idx) => {
-            return (
-              <ListItem key={idx}>
-                <ListItemIcon>
-                  <Checkbox
-                    edge="start"
-                    onChange={() => handleSelectClick("movies", idx)}
-                    checked={selected.movies.includes(idx)}
-                  />
-                </ListItemIcon>
-                <ListItemText primary={movie.Title} />
-              </ListItem>
-            );
-          })}
-        </List>
+        <ActivityTable
+          activities={movies}
+          category="movies"
+          selected={selected}
+          handleSelectClick={handleSelectClick}
+          handleSelectAll={handleSelectAll}
+          handleEdit={handleEdit}
+        />
       </div>
       <div style={{ marginTop: "20px" }}>
         <div style={{ display: "flex", marginBottom: "5px" }}>
-          <Checkbox
-            edge="start"
-            indeterminate={
-              selected.tvShows.length > 0 &&
-              selected.tvShows.length < tvShows.length
-            }
-            checked={
-              tvShows.length > 0 && selected.tvShows.length === tvShows.length
-            }
-            onChange={(event) => handleSelectAll(event, "tvShows")}
-            sx={{
-              color: "white",
-              fontSize: "24px",
-              paddingY: "0px",
-              paddingLeft: "10px",
-              paddingRight: "8px",
-              "&.Mui-checked": {
-                color: "#CDDC39",
-              },
-              "&.MuiCheckbox-indeterminate": {
-                color: "#CDDC39",
-              },
-            }}
-          />
           <h2
             style={{
               color: "white",
@@ -320,52 +306,17 @@ export default function ActivityOptions({
             TV Shows
           </h2>
         </div>
-        <List
-          style={{
-            backgroundColor: "#f4f4f9",
-            borderRadius: "8px",
-            padding: "10px",
-          }}
-        >
-          {tvShows.map((tvShow, idx) => {
-            return (
-              <ListItem key={idx}>
-                <ListItemIcon>
-                  <Checkbox
-                    edge="start"
-                    onChange={() => handleSelectClick("tvShows", idx)}
-                    checked={selected.tvShows.includes(idx)}
-                  />
-                </ListItemIcon>
-                <ListItemText primary={tvShow.Title} />
-              </ListItem>
-            );
-          })}
-        </List>
+        <ActivityTable
+          activities={tvShows}
+          category="tvShows"
+          selected={selected}
+          handleSelectClick={handleSelectClick}
+          handleSelectAll={handleSelectAll}
+          handleEdit={() => handleEdit()}
+        />
       </div>
       <div style={{ marginTop: "20px" }}>
         <div style={{ display: "flex", marginBottom: "5px" }}>
-          <Checkbox
-            edge="start"
-            indeterminate={
-              selected.games.length > 0 && selected.games.length < games.length
-            }
-            checked={games.length > 0 && selected.games.length === games.length}
-            onChange={(event) => handleSelectAll(event, "games")}
-            sx={{
-              color: "white",
-              fontSize: "24px",
-              paddingY: "0px",
-              paddingLeft: "10px",
-              paddingRight: "8px",
-              "&.Mui-checked": {
-                color: "#CDDC39",
-              },
-              "&.MuiCheckbox-indeterminate": {
-                color: "#CDDC39",
-              },
-            }}
-          />
           <h2
             style={{
               color: "white",
@@ -377,28 +328,14 @@ export default function ActivityOptions({
             Games
           </h2>
         </div>
-        <List
-          style={{
-            backgroundColor: "#f4f4f9",
-            borderRadius: "8px",
-            padding: "10px",
-          }}
-        >
-          {games.map((game, idx) => {
-            return (
-              <ListItem key={idx}>
-                <ListItemIcon>
-                  <Checkbox
-                    edge="start"
-                    onChange={() => handleSelectClick("games", idx)}
-                    checked={selected.games.includes(idx)}
-                  />
-                </ListItemIcon>
-                <ListItemText primary={game.Title} />
-              </ListItem>
-            );
-          })}
-        </List>
+        <ActivityTable
+          activities={games}
+          category="games"
+          selected={selected}
+          handleSelectClick={handleSelectClick}
+          handleSelectAll={handleSelectAll}
+          handleEdit={() => {}}
+        />
       </div>
       <ConfirmDialog
         isOpen={confirmDeleteOpen}
@@ -439,6 +376,14 @@ export default function ActivityOptions({
         handleSelectAll={handleSelectAll}
         isOpen={randomizerOpen}
         onClose={() => setRandomizerOpen(false)}
+      />
+      <EditDialog
+        open={editOpen}
+        onClose={() => setEditOpen(false)}
+        onUpdate={(id, fields) => handleUpdate(id, editProps.category, fields)}
+        title="Edit Activity"
+        id={editProps.id}
+        fields={editProps.fields}
       />
     </div>
   );

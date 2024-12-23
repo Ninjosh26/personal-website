@@ -97,6 +97,43 @@ const useActivities = () => {
     }
   };
 
+  // Function to update an activity
+  const updateActivity = async (id, category, fields) => {
+    try {
+      const response = await fetch(`${API_URL}/${category}/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(fields),
+      });
+      if (!response.ok) throw new Error("Failed to update activity");
+
+      if (category === "movies") {
+        setMovies(
+          movies.map((movie) =>
+            id === movie.MovieId ? { ...movie, ...fields } : movie
+          )
+        );
+      } else if (category === "tvShows") {
+        setTvShows(
+          tvShows.map((tvShow) =>
+            id === tvShow.TVShowId ? { ...tvShow, ...fields } : tvShow
+          )
+        );
+      } else if (category === "games") {
+        setGames(
+          games.map((game) =>
+            id === game.GameId ? { ...game, ...fields } : game
+          )
+        );
+      }
+    } catch (error) {
+      setError(error.message);
+      alert("Error updating activity");
+    }
+  };
+
   return {
     movies,
     tvShows,
@@ -104,6 +141,7 @@ const useActivities = () => {
     loading,
     error,
     addActivity,
+    updateActivity,
     deleteActivities,
   };
 };

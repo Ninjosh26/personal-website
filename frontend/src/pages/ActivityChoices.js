@@ -3,8 +3,14 @@ import { ActivityOptions } from "../components";
 import useActivities from "../hooks/useActivities";
 
 export default function ActivityChoices() {
-  const { movies, tvShows, games, addActivity, deleteActivities } =
-    useActivities();
+  const {
+    movies,
+    tvShows,
+    games,
+    addActivity,
+    updateActivity,
+    deleteActivities,
+  } = useActivities();
 
   useEffect(() => {
     document.title = "Kate's Website - Activity Choices";
@@ -18,6 +24,7 @@ export default function ActivityChoices() {
         tvShows={tvShows}
         games={games}
         addItem={addActivity}
+        updateItem={updateActivity}
         deleteItems={deleteActivities}
       />
     </div>
