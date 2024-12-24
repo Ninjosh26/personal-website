@@ -7,6 +7,7 @@ export default function ActivityChoices() {
     movies,
     tvShows,
     games,
+    addTrigger,
     addActivity,
     updateActivity,
     deleteActivities,
@@ -24,6 +25,7 @@ export default function ActivityChoices() {
         tvShows={tvShows}
         games={games}
         addItem={addActivity}
+        addTrigger={addTrigger}
         updateItem={updateActivity}
         deleteItems={deleteActivities}
       />

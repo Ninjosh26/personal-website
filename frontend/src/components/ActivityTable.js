@@ -16,7 +16,7 @@ import {
 } from "@mui/material";
 import { visuallyHidden } from "@mui/utils";
 import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -75,9 +75,29 @@ export default function ActivityTable({
   handleSelectClick,
   handleSelectAll,
   handleEdit,
+  triggerScroll,
 }) {
   const [order, setOrder] = useState("asc");
   const [orderBy, setOrderBy] = useState(null);
+  const [highlight, setHighlight] = useState(null);
+  const lastRowRef = useRef(null);
+
+  useEffect(() => {
+    if (triggerScroll === category && lastRowRef.current) {
+      lastRowRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+
+      setHighlight(activities.length - 1);
+
+      // Remove the highlight after 2 seconds
+      const timeout = setTimeout(() => {
+        setHighlight(null);
+      }, 2000);
+      return () => clearTimeout(timeout);
+    }
+  }, [triggerScroll]);
 
   const prettyTimestamp = (timestamp) => {
     const date = new Date(timestamp);
@@ -200,7 +220,12 @@ export default function ActivityTable({
             .map((activity, idx) => (
               <StyledTableRow
                 key={idx}
+                ref={idx === activities.length - 1 ? lastRowRef : null}
                 sx={{ "& > *": { borderBottom: "unset" } }}
+                style={{
+                  transition: "background-color 0.5s",
+                  backgroundColor: idx === highlight ? "#e0f7fa" : "",
+                }}
               >
                 <StyledTableCell>
                   <Checkbox

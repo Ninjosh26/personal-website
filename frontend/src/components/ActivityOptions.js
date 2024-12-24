@@ -29,6 +29,7 @@ export default function ActivityOptions({
   tvShows,
   games,
   addItem,
+  addTrigger,
   updateItem,
   deleteItems,
 }) {
@@ -285,6 +286,7 @@ export default function ActivityOptions({
           handleSelectClick={handleSelectClick}
           handleSelectAll={handleSelectAll}
           handleEdit={handleEdit}
+          triggerScroll={addTrigger}
         />
       </div>
       <div style={{ marginTop: "20px" }}>
@@ -307,6 +309,7 @@ export default function ActivityOptions({
           handleSelectClick={handleSelectClick}
           handleSelectAll={handleSelectAll}
           handleEdit={handleEdit}
+          triggerScroll={addTrigger}
         />
       </div>
       <div style={{ marginTop: "20px" }}>
@@ -329,6 +332,7 @@ export default function ActivityOptions({
           handleSelectClick={handleSelectClick}
           handleSelectAll={handleSelectAll}
           handleEdit={handleEdit}
+          triggerScroll={addTrigger}
         />
       </div>
       <ConfirmDialog

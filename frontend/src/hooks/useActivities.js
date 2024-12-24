@@ -9,6 +9,7 @@ const useActivities = () => {
   const [games, setGames] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [addTrigger, setAddTrigger] = useState(null);
 
   // Function to fetch activities
   const fetchActivities = async (url, category) => {
@@ -58,6 +59,9 @@ const useActivities = () => {
         } else {
           console.error(`Unrecognized type: ${category}`);
         }
+
+        setAddTrigger(category);
+        setTimeout(() => setAddTrigger(null), 5000);
 
         return data;
       } catch (error) {
@@ -140,6 +144,7 @@ const useActivities = () => {
     games,
     loading,
     error,
+    addTrigger,
     addActivity,
     updateActivity,
     deleteActivities,
