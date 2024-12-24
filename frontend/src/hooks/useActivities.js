@@ -61,7 +61,7 @@ const useActivities = () => {
         }
 
         setAddTrigger(category);
-        setTimeout(() => setAddTrigger(null), 5000);
+        setTimeout(() => setAddTrigger(null), 2000);
 
         return data;
       } catch (error) {
