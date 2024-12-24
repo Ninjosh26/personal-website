@@ -118,7 +118,7 @@ app.post("/api/tvshows", async (req, res) => {
         DECLARE @InsertedRecord TABLE (TVShowId INT, Title NVARCHAR(128), CreatedAt DATETIME2);
 
         INSERT INTO TVShows (Title)
-        OUTPUT inserted.TVShowId, inserted.Title, inserted.CreatedAt INTO @InsertedRecord
+        OUTPUT inserted.TVShowId, inserted.Title, inserted.CreatedAt, inserted.UpdatedAt INTO @InsertedRecord
         VALUES (@Title);
 
         SELECT * FROM @InsertedRecord;
@@ -198,7 +198,7 @@ app.post("/api/games", async (req, res) => {
         DECLARE @InsertedRecord TABLE (GameId INT, Title NVarChar(128), CreatedAt DATETIME2);
     
         INSERT INTO Games (Title)
-        OUTPUT inserted.GameId, inserted.Title, inserted.CreatedAt INTO @InsertedRecord
+        OUTPUT inserted.GameId, inserted.Title, inserted.CreatedAt, inserted.UpdatedAt INTO @InsertedRecord
         VALUES (@Title);
 
         SELECT * FROM @InsertedRecord;
