@@ -84,15 +84,15 @@ export default function ActivityOptions({
 
     let newSelected = {
       movies:
-        category === "movies"
+        category === activityCategories.movies
           ? handleSelectArray(selected.movies)
           : selected.movies,
       tvShows:
-        category === "tvShows"
+        category === activityCategories.tvShows
           ? handleSelectArray(selected.tvShows)
           : selected.tvShows,
       games:
-        category === "games"
+        category === activityCategories.games
           ? handleSelectArray(selected.games)
           : selected.games,
     };
@@ -119,13 +119,13 @@ export default function ActivityOptions({
 
     if (event.target.checked) {
       switch (category) {
-        case "movies":
+        case activityCategories.movies:
           newSelected = getAll(movies);
           break;
-        case "tvShows":
+        case activityCategories.tvShows:
           newSelected = getAll(tvShows);
           break;
-        case "games":
+        case activityCategories.games:
           newSelected = getAll(games);
           break;
         default:
@@ -134,9 +134,18 @@ export default function ActivityOptions({
     }
 
     setSelected((prevSelected) => ({
-      movies: category === "movies" ? newSelected : prevSelected.movies,
-      tvShows: category === "tvShows" ? newSelected : prevSelected.tvShows,
-      games: category === "games" ? newSelected : prevSelected.games,
+      movies:
+        category === activityCategories.movies
+          ? newSelected
+          : prevSelected.movies,
+      tvShows:
+        category === activityCategories.tvShows
+          ? newSelected
+          : prevSelected.tvShows,
+      games:
+        category === activityCategories.games
+          ? newSelected
+          : prevSelected.games,
     }));
   };
 
@@ -144,11 +153,11 @@ export default function ActivityOptions({
     setEditProps((prevProps) => {
       const updated = { ...prevProps };
 
-      if (category === "movies") {
+      if (category === activityCategories.movies) {
         updated.id = activity.MovieId;
-      } else if (category === "tvShows") {
+      } else if (category === activityCategories.tvShows) {
         updated.id = activity.TVShowId;
-      } else if (category === "games") {
+      } else if (category === activityCategories.games) {
         updated.id = activity.GameId;
       }
 
@@ -281,7 +290,7 @@ export default function ActivityOptions({
         </div>
         <ActivityTable
           activities={movies}
-          category="movies"
+          category={activityCategories.movies}
           selected={selected}
           handleSelectClick={handleSelectClick}
           handleSelectAll={handleSelectAll}
@@ -304,7 +313,7 @@ export default function ActivityOptions({
         </div>
         <ActivityTable
           activities={tvShows}
-          category="tvShows"
+          category={activityCategories.tvShows}
           selected={selected}
           handleSelectClick={handleSelectClick}
           handleSelectAll={handleSelectAll}
@@ -327,7 +336,7 @@ export default function ActivityOptions({
         </div>
         <ActivityTable
           activities={games}
-          category="games"
+          category={activityCategories.games}
           selected={selected}
           handleSelectClick={handleSelectClick}
           handleSelectAll={handleSelectAll}

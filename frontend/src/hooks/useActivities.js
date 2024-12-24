@@ -49,7 +49,7 @@ const useActivities = () => {
         if (!response.ok) throw new Error(`Failed to add ${category}`);
         const data = await response.json();
 
-        // Update the apporpriate state based on category
+        // Update the appropriate state based on category
         if (category === activityCategories.movies) {
           setMovies((prevMovies) => [...prevMovies, data]);
         } else if (category === activityCategories.tvShows) {
@@ -113,19 +113,19 @@ const useActivities = () => {
       });
       if (!response.ok) throw new Error("Failed to update activity");
 
-      if (category === "movies") {
+      if (category === activityCategories.movies) {
         setMovies(
           movies.map((movie) =>
             id === movie.MovieId ? { ...movie, ...fields } : movie
           )
         );
-      } else if (category === "tvShows") {
+      } else if (category === activityCategories.tvShows) {
         setTvShows(
           tvShows.map((tvShow) =>
             id === tvShow.TVShowId ? { ...tvShow, ...fields } : tvShow
           )
         );
-      } else if (category === "games") {
+      } else if (category === activityCategories.games) {
         setGames(
           games.map((game) =>
             id === game.GameId ? { ...game, ...fields } : game

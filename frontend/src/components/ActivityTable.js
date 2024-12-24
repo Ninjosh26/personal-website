@@ -95,10 +95,10 @@ export default function ActivityTable({
       // Remove the highlight after 2 seconds
       const timeout = setTimeout(() => {
         setHighlight(null);
-      }, 2000);
+      }, 1000);
       return () => clearTimeout(timeout);
     }
-  }, [triggerScroll]);
+  }, [triggerScroll, activities, category]);
 
   const prettyTimestamp = (timestamp) => {
     const date = new Date(timestamp);
@@ -225,7 +225,7 @@ export default function ActivityTable({
                 sx={{ "& > *": { borderBottom: "unset" } }}
                 style={{
                   transition: "background-color 0.5s",
-                  backgroundColor: idx === highlight ? "#e0f7fa" : "",
+                  backgroundColor: idx === highlight ? "#9beffa" : "",
                 }}
               >
                 <StyledTableCell>

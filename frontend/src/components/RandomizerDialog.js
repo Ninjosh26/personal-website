@@ -11,6 +11,7 @@ import {
   ListItemText,
   Typography,
 } from "@mui/material";
+import { activityCategories } from "./ActivityOptions";
 
 export default function RandomizerDialog({
   movies,
@@ -63,7 +64,9 @@ export default function RandomizerDialog({
               checked={
                 movies.length > 0 && selected.movies.length === movies.length
               }
-              onChange={(event) => handleSelectAll(event, "movies")}
+              onChange={(event) =>
+                handleSelectAll(event, activityCategories.movies)
+              }
               sx={{
                 fontSize: "24px",
                 paddingY: "0px",
@@ -97,7 +100,9 @@ export default function RandomizerDialog({
                   <ListItemIcon>
                     <Checkbox
                       edge="start"
-                      onChange={() => handleSelectClick("movies", idx)}
+                      onChange={() =>
+                        handleSelectClick(activityCategories.movies, idx)
+                      }
                       checked={selected.movies.includes(idx)}
                     />
                   </ListItemIcon>
@@ -118,7 +123,9 @@ export default function RandomizerDialog({
               checked={
                 tvShows.length > 0 && selected.tvShows.length === tvShows.length
               }
-              onChange={(event) => handleSelectAll(event, "tvShows")}
+              onChange={(event) =>
+                handleSelectAll(event, activityCategories.tvShows)
+              }
               sx={{
                 fontSize: "24px",
                 paddingY: "0px",
@@ -152,7 +159,9 @@ export default function RandomizerDialog({
                   <ListItemIcon>
                     <Checkbox
                       edge="start"
-                      onChange={() => handleSelectClick("tvShows", idx)}
+                      onChange={() =>
+                        handleSelectClick(activityCategories.tvShows, idx)
+                      }
                       checked={selected.tvShows.includes(idx)}
                     />
                   </ListItemIcon>
@@ -173,7 +182,9 @@ export default function RandomizerDialog({
               checked={
                 games.length > 0 && selected.games.length === games.length
               }
-              onChange={(event) => handleSelectAll(event, "games")}
+              onChange={(event) =>
+                handleSelectAll(event, activityCategories.games)
+              }
               sx={{
                 fontSize: "24px",
                 paddingY: "0px",
@@ -207,7 +218,9 @@ export default function RandomizerDialog({
                   <ListItemIcon>
                     <Checkbox
                       edge="start"
-                      onChange={() => handleSelectClick("games", idx)}
+                      onChange={() =>
+                        handleSelectClick(activityCategories.games, idx)
+                      }
                       checked={selected.games.includes(idx)}
                     />
                   </ListItemIcon>
