@@ -1,0 +1,44 @@
+.meal-grid {
+  display: grid;
+  grid-template-columns: 150px repeat(7, 1fr); /* One fixed-width column for headers, 7 equal columns for days */
+  overflow-x: auto;
+}
+
+.header-row {
+  display: contents; /* Use contents to apply grid layout for headers */
+}
+
+.header-cell {
+  background-color: #f4f4f4;
+  text-align: center;
+  font-weight: bold;
+  padding: 10px;
+  border: 1px solid #ccc;
+}
+
+.empty {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+}
+
+.row {
+  display: contents;
+}
+
+.cell {
+  background-color: #fff;
+  border: 1px solid #ccc;
+  text-align: center;
+  padding: 10px;
+  min-width: 100px;
+}
+
+.row-header {
+  background-color: #f0f0f0;
+  font-weight: bold;
+  text-align: center;
+  position: sticky;
+  left: 0;
+  z-index: 1;
+}
