@@ -1,7 +1,9 @@
 .meal-grid {
   display: grid;
-  grid-template-columns: 150px repeat(7, 1fr); /* One fixed-width column for headers, 7 equal columns for days */
-  overflow-x: auto;
+  grid-template-columns: repeat(
+    8,
+    10vw
+  ); /* One fixed-width column for headers, 7 equal columns for days */
 }
 
 .header-row {
@@ -30,8 +32,10 @@
   background-color: #fff;
   border: 1px solid #ccc;
   text-align: center;
-  padding: 10px;
-  min-width: 100px;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .row-header {
