@@ -1,9 +1,10 @@
 .meal-grid {
   display: grid;
-  grid-template-columns: repeat(
-    8,
-    10vw
-  ); /* One fixed-width column for headers, 7 equal columns for days */
+  grid-template-columns: repeat(8, 200px);
+  overflow-x: visible;
+  overflow-y: hidden;
+  height: "100%";
+  width: 70vw;
 }
 
 .header-row {
@@ -11,17 +12,21 @@
 }
 
 .header-cell {
-  background-color: #f4f4f4;
+  background-color: #333;
+  color: white;
   text-align: center;
   font-weight: bold;
   padding: 10px;
   border: 1px solid #ccc;
 }
 
-.empty {
+.navigation {
   position: sticky;
   left: 0;
   z-index: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .row {
@@ -39,10 +44,31 @@
 }
 
 .row-header {
-  background-color: #f0f0f0;
+  background-color: #333;
   font-weight: bold;
   text-align: center;
   position: sticky;
   left: 0;
   z-index: 1;
+}
+
+.highlight-header {
+  border: 1px solid #ffd700;
+  background-color: #46443e;
+}
+
+.highlight {
+  background-color: #fffae6;
+  border: 1px solid #ffd700;
+}
+
+.disabled {
+  background-color: #e2dfdf;
+  pointer-events: none;
+}
+
+.droppable {
+  min-height: 100px;
+  width: 100%;
+  justify-items: center;
 }

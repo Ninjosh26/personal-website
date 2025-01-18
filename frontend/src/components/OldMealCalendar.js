@@ -1,5 +1,5 @@
 import "./styles/MealCalendar.css";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   DndContext,
   DragOverlay,
@@ -14,12 +14,69 @@ import { Button, IconButton, Tooltip } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 
-const mealTypes = {
+export const mealTypes = {
   breakfast: "Breakfast",
   lunch: "Lunch",
   snack: "Snack",
   dinner: "Dinner",
 };
+
+const sampleRecipes = [
+  {
+    MealId: 1,
+    Name: "Chicken Alfredo",
+    Ingredients: [
+      "Fettuccine",
+      "Heavy Cream",
+      "Butter",
+      "Garlic",
+      "Chicken",
+      "Parmesan",
+    ],
+    Instructions: [
+      "Cook fettuccine",
+      "Cook chicken",
+      "Heat butter and garlic, add cream, then stir in parmesan",
+      "Toss with pasta and serve",
+    ],
+  },
+  {
+    MealId: 2,
+    Name: "Greek Salad",
+    Ingredients: [
+      "Romaine Lettuce",
+      "Cucumbers",
+      "Tomatoes",
+      "Red Onion",
+      "Feta",
+      "Olives",
+      "Olive Oil",
+    ],
+    Instructions: [
+      "Chop vegetables and mix with olives",
+      "Drizzle with olive oil and sprinkle oregano",
+      "Top with crumbled feta",
+    ],
+  },
+  {
+    MealId: 3,
+    Name: "Butter Chicken",
+    Ingredients: [
+      "Chicken",
+      "Butter",
+      "Tomatoes",
+      "Cream",
+      "Garlic",
+      "Ginger",
+      "Garam Masala",
+    ],
+    Instructions: [
+      "Marinate chicken with spices",
+      "Cook in butter, add tomato puree and cream",
+      "Simmer and serve with naan or rice",
+    ],
+  },
+];
 
 const days = [
   "Sunday",
@@ -30,6 +87,32 @@ const days = [
   "Friday",
   "Saturday",
 ];
+
+const mealTypes = [
+  { MealTypeId: 1, Name: "Breakfast" },
+  { MealTypeId: 2, Name: "Lunch" },
+  { MealTypeId: 3, Name: "Snack" },
+  { MealTypeId: 4, Name: "Dinner" },
+];
+
+const dictionaryMeals = sampleRecipes.reduce((acc, meal, idx) => {
+  const key = `recipe${idx + 1}`;
+  acc[key] = {
+    id: key,
+    Location: "recipes",
+    ...meal,
+  };
+
+  return acc;
+}, {});
+
+// Unique ID generator to keep all draggable items unique
+const uniqueId = (length = 16) => {
+  return Math.ceil(Math.random() * Date.now())
+    .toPrecision(length)
+    .toString()
+    .replace(".", "");
+};
 
 // Colors for categories (might change with themes)
 const categoryColors = [
@@ -46,7 +129,6 @@ function applyOpacity(color, opacity) {
   return color + value;
 }
 
-// Droppable component
 function Droppable({ id, children }) {
   const { isOver, setNodeRef } = useDroppable({
     id: id,
@@ -57,8 +139,8 @@ function Droppable({ id, children }) {
       ref={setNodeRef}
       style={{
         backgroundColor: isOver ? "#f0ebeb" : undefined,
-        height: "100%",
         width: "100%",
+        height: "100%",
       }}
     >
       {children}
@@ -66,18 +148,27 @@ function Droppable({ id, children }) {
   );
 }
 
-// Draggable component
-function Draggable({ id, color, onDoubleClick, children }) {
+function Draggable({ meal, onDoubleClick, children }) {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
-    id: id,
+    id: meal.id,
   });
   const [hover, setHover] = useState(false);
 
+  const color =
+    meal.Location === "recipes"
+      ? "#eeeeee"
+      : categoryColors[
+          (meal.Location.split("-")[1] - 1) % categoryColors.length
+        ].light;
+
   return (
-    // Wrap in padded container to put gaps between draggables without altering surrounding cells
+    // Wrap in padded container to put gaps between draggables without altering surrouding cells
     <div
       ref={setNodeRef}
-      style={{ paddingTop: "5px", paddingBottom: "5px" }}
+      style={{
+        paddingTop: "5px",
+        paddingBottom: "5px",
+      }}
       {...listeners}
       {...attributes}
     >
@@ -103,54 +194,18 @@ function Draggable({ id, color, onDoubleClick, children }) {
   );
 }
 
-export default function MealCalendar({
-  recipes,
-  meals,
-  recipeTags,
-  ingredients,
-  getMeals,
-  getRecipeIngredients,
-  getRecipeInstructions,
-  addRecipe,
-  addMeal,
-  deleteRecipe,
-  deleteMeal,
-  updateRecipe,
-  updateMeal,
-}) {
-  const [activeDrag, setActiveDrag] = useState(null);
+export default function MealCalendar() {
+  const [recipes, setRecipes] = useState(dictionaryMeals);
+  const [meals, setMeals] = useState(dictionaryMeals);
+  const [activeId, setActiveId] = useState(null);
   const [viewRecipe, setViewRecipe] = useState(false);
-  const [currentWeek, setCurrentWeek] = useState([]);
   const [recipeFields, setRecipeFields] = useState([]);
+  const [currentWeek, setCurrentWeek] = useState([]);
 
-  // Generate the list of dates for the week 'date' is in
-  const getWeek = useCallback((date) => {
-    // Calculate the start of the week (Sunday)
-    const startOfWeek = new Date(date);
-    startOfWeek.setDate(date.getDate() - date.getDay());
-    startOfWeek.setHours(0, 0, 0, 0);
-
-    // Generate all dates in the week
-    const week = [];
-    for (let i = 0; i < 7; i++) {
-      const weekDate = new Date(startOfWeek);
-      weekDate.setDate(startOfWeek.getDate() + i);
-      week.push(weekDate);
-    }
-
-    return week;
-  }, []);
-
-  const handleCurrentWeek = useCallback(() => {
-    const week = getWeek(new Date());
-    setCurrentWeek(week);
-    getMeals(week[0]);
-  }, [getWeek, setCurrentWeek, getMeals]);
-
-  // Initialize with the current day
+  // Get the current day
   useEffect(() => {
-    handleCurrentWeek();
-  }, [handleCurrentWeek]);
+    setCurrentWeek(getWeek(new Date()));
+  }, []);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -160,6 +215,24 @@ export default function MealCalendar({
     })
   );
 
+  const getWeek = (date) => {
+    // Calculate the start of the week (Sunday)
+    const startOfWeek = new Date(date);
+    startOfWeek.setDate(date.getDate() - date.getDay());
+
+    // Generate all dates in the week
+    const week = [];
+    for (let i = 0; i < 7; i++) {
+      const weekDate = new Date(startOfWeek);
+      weekDate.setDate(startOfWeek.getDate() + i);
+      week.push(weekDate);
+    }
+
+    console.log(week);
+
+    return week;
+  };
+
   const isSameDay = (date1, date2) => {
     return (
       date1.getFullYear() === date2.getFullYear() &&
@@ -168,17 +241,13 @@ export default function MealCalendar({
     );
   };
 
-  // Component for undraggable meal
-  const undraggableMarkup = (id) => {
-    const [location, recipeId] = id.split("-");
+  const undraggableMarkup = (item) => {
     const color =
-      categoryColors[Math.floor(location / 7) % categoryColors.length].light;
+      categoryColors[(item.Location.split("-")[1] - 1) % categoryColors.length]
+        .light;
 
     return (
-      <div
-        key={`undraggable-${id}`}
-        style={{ paddingTop: "5px", paddingBottom: "5px" }}
-      >
+      <div key={item.id} style={{ paddingTop: "5px", paddingBottom: "5px" }}>
         <div
           style={{
             width: "190px",
@@ -186,109 +255,99 @@ export default function MealCalendar({
             paddingTop: "10px",
             paddingBottom: "10px",
             borderRadius: "5px",
-            boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
+            boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1",
             textAlign: "center",
           }}
         >
-          {recipes[recipeId].Name}
+          {item.Name}
         </div>
       </div>
     );
   };
 
-  // Component for draggable meal
-  const draggableMarkup = (id, recipe) => {
-    const [location] = id.split("-");
-    const color =
-      location === "recipe"
-        ? "#eeeeee"
-        : categoryColors[Math.floor(location / 7) % categoryColors.length]
-            .light;
-    return (
-      <Draggable
-        id={id}
-        key={`draggable-${id}`}
-        color={color}
-        onDoubleClick={async () => {
-          // Extract recipe fields to display
-          const { RecipeId, Name } = recipe;
-          const ingrs = await getRecipeIngredients(RecipeId);
-          const instructions = await getRecipeInstructions(RecipeId);
-          setRecipeFields([
-            {
-              label: "Name",
-              value: Name,
-            },
-            {
-              label: "Ingredients",
-              value: ingrs.map(
-                (ingr) =>
-                  `${ingr.Amount} - ${ingredients[ingr.IngredientId].Name}`
-              ),
-              display: "accordian",
-            },
-            {
-              label: "Instructions",
-              value: instructions,
-              display: "numberedAccordian",
-            },
-          ]);
-          setViewRecipe(true);
-        }}
-      >
-        {recipe.Name}
-      </Draggable>
-    );
-  };
+  const draggableMarkup = (item) => (
+    <Draggable
+      key={item.id}
+      meal={item}
+      onDoubleClick={() => {
+        // Extract recipe fields to display
+        const { Name, Ingredients, Instructions } = item;
+        setRecipeFields([
+          {
+            label: "Name",
+            value: Name,
+          },
+          {
+            label: "Ingredients",
+            value: Ingredients,
+            display: "accordian",
+          },
+          {
+            label: "Instructions",
+            value: Instructions,
+            display: "numberedAccordian",
+          },
+        ]);
+        setViewRecipe(true);
+      }}
+    >
+      {item.Name}
+    </Draggable>
+  );
 
   const handleDragStart = (event) => {
-    const [location, recipeId] = event.active.id.split("-");
-    setActiveDrag({
-      location,
-      recipe: recipes[recipeId],
-    });
+    setActiveId(event.active.id);
   };
 
   const handleDragEnd = (event) => {
     const { over, active } = event;
-    const [dropSlot] = over ? over.id.split("-") : [0, 0];
-    const [dragSlot, recipeId, mealId] = active.id.split("-");
-    setActiveDrag(null);
+    setActiveId(null);
 
-    // Insert meal into calendar
-    if (dragSlot === "recipe" && over) {
-      addMeal(recipeId, currentWeek[dropSlot % 7], Math.floor(dropSlot / 7));
-    }
-
-    if (dragSlot !== "recipe") {
-      const mealType = Math.floor(dropSlot / 7);
-      const mealSlot = meals[Math.floor(dragSlot / 7)][dragSlot % 7];
-      const mealIdx = mealSlot.findIndex(
-        (meal) => meal.MealId === parseInt(mealId)
-      );
-
-      if (over) {
-        // Change location of meal
-        updateMeal(mealSlot[mealIdx], currentWeek[dropSlot % 7], mealType);
-      } else {
-        // Delete meal if moved off calendar
-        deleteMeal(mealSlot[mealIdx]);
+    setMeals((prevMeals) => {
+      // Copy available meal to calendar
+      if (active.id.startsWith("recipe") && over) {
+        const newId = uniqueId();
+        return {
+          ...prevMeals,
+          [newId]: {
+            ...prevMeals[active.id],
+            id: newId,
+            Location: over.id,
+          },
+        };
       }
-    }
+
+      // Delete meal if moved off calendar
+      if (!active.id.startsWith("recipe") && !over) {
+        const { [active.id]: _, ...updatedMeals } = prevMeals;
+        return updatedMeals;
+      }
+
+      // Otherwise, standard move
+      return {
+        ...prevMeals,
+        [active.id]: {
+          ...prevMeals[active.id],
+          Location: over ? over.id : "recipes",
+        },
+      };
+    });
   };
 
   const handlePreviousWeek = () => {
     const startOfPrevWeek = new Date(currentWeek[0]);
     startOfPrevWeek.setDate(startOfPrevWeek.getDate() - 7);
     setCurrentWeek(getWeek(startOfPrevWeek));
-    getMeals(startOfPrevWeek);
+  };
+
+  const handleCurrentWeek = () => {
+    setCurrentWeek(getWeek(new Date()));
   };
 
   const handleNextWeek = () => {
     const startOfNextWeek = new Date(currentWeek[0]);
     startOfNextWeek.setDate(startOfNextWeek.getDate() + 7);
     setCurrentWeek(getWeek(startOfNextWeek));
-    getMeals(startOfNextWeek);
   };
 
   return (
@@ -315,7 +374,7 @@ export default function MealCalendar({
         >
           <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
             <h2>Recipes</h2>
-            <Tooltip title="Add a New Recipe">
+            <Tooltip title="Add a New Activity">
               <Button
                 variant="contained"
                 onClick={() => {}}
@@ -331,7 +390,7 @@ export default function MealCalendar({
             </Tooltip>
           </div>
           {Object.values(recipes).map((recipe) =>
-            draggableMarkup(`recipe-${recipe.RecipeId}`, recipe)
+            recipe.Location === "recipes" ? draggableMarkup(recipe) : null
           )}
         </div>
         <div style={{ flex: 1 }}>
@@ -373,11 +432,11 @@ export default function MealCalendar({
                   </IconButton>
                 </Tooltip>
               </div>
-              {currentWeek.map((day, idx) => {
+              {currentWeek.map((day) => {
                 const isToday = day && isSameDay(day, new Date());
                 return (
                   <div
-                    key={`day-${idx}`}
+                    key={day.getDate()}
                     className={`header-cell${
                       isToday ? " highlight-header" : ""
                     }`}
@@ -392,52 +451,49 @@ export default function MealCalendar({
                 );
               })}
             </div>
-            {Object.values(mealTypes).map((mealType, idx) => (
-              <div key={`mealType-${idx}`} className="row">
+            {mealTypes.map((mealType) => (
+              <div key={mealType.MealTypeId} className="row">
                 <div
                   className="cell row-header"
                   style={{
-                    color: categoryColors[idx % categoryColors.length].dark,
+                    color:
+                      categoryColors[
+                        (mealType.MealTypeId - 1) % categoryColors.length
+                      ].dark,
                   }}
                 >
-                  {mealType}
+                  {mealType.Name}
                 </div>
-                {currentWeek.map((day, dayNum) => {
-                  const slotNum = idx * 7 + dayNum;
-                  const dropId = `${slotNum}-slot`;
-                  const assignedItems = meals[idx][day.getDay()];
-                  const isToday = day && isSameDay(day, new Date());
-                  const isPast = day < new Date().setHours(0, 0, 0, 0);
+                {days.map((day, idx) => {
+                  const dropId = `${day}-${mealType.MealTypeId}`;
+                  const assignedItems = Object.values(meals).filter(
+                    (meal) => meal.Location === dropId
+                  );
+                  const date = currentWeek[idx];
+                  const isToday = date && isSameDay(date, new Date());
+                  const isPast = date < new Date().setHours(0, 0, 0, 0);
 
                   return (
                     <div
-                      key={`mealSlot-${dropId}`}
+                      key={dropId}
                       className={`cell${isToday ? " highlight" : ""}${
                         isPast ? " disabled" : ""
                       }`}
                     >
                       {isPast ? (
-                        <div
-                          className="droppable"
-                          key={`undroppable-${dropId}`}
-                        >
+                        <div className="droppable">
                           {assignedItems.length > 0
                             ? assignedItems.map((item) =>
-                                undraggableMarkup(
-                                  `${slotNum}-${item.RecipeId}-${item.MealId}`
-                                )
+                                undraggableMarkup(item)
                               )
                             : null}
                         </div>
                       ) : (
-                        <Droppable id={dropId} key={`droppable-${dropId}`}>
+                        <Droppable key={dropId} id={dropId}>
                           <div className="droppable">
                             {assignedItems.length > 0
                               ? assignedItems.map((item) =>
-                                  draggableMarkup(
-                                    `${slotNum}-${item.RecipeId}-${item.MealId}`,
-                                    recipes[item.RecipeId]
-                                  )
+                                  draggableMarkup(item)
                                 )
                               : null}
                           </div>
@@ -452,15 +508,15 @@ export default function MealCalendar({
         </div>
       </div>
       <DragOverlay>
-        {activeDrag ? (
+        {activeId ? (
           <div
             style={{
               padding: "10px",
               backgroundColor:
-                activeDrag.location === "recipe"
+                meals[activeId].Location === "recipes"
                   ? "#eeeeee"
                   : categoryColors[
-                      Math.floor(activeDrag.location / 7) %
+                      meals[activeId].Location.split("-")[1] %
                         categoryColors.length
                     ].light,
               borderRadius: "5px",
@@ -468,7 +524,7 @@ export default function MealCalendar({
               textAlign: "center",
             }}
           >
-            {activeDrag.recipe.Name}
+            {meals[activeId]?.Name || "Dragging..."}
           </div>
         ) : null}
       </DragOverlay>
