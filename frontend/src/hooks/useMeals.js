@@ -57,7 +57,7 @@ export const useSampleMeals = () => {
         setRecipeTags(await fetchRecipeTags());
         setIngredients(await fetchIngredients());
       } catch (error) {
-        setError(error.mesage);
+        setError(error.message);
       } finally {
         setLoading(false);
       }
@@ -149,7 +149,7 @@ export const useSampleMeals = () => {
     database.updateMeal({ mealId: meal.MealId, date, mealType });
     setMeals((prevMeals) => {
       const updatedMeals = [...prevMeals];
-      const idx = prevMeals[meal.MealType][date.getDay()].findIndex(
+      const idx = prevMeals[meal.MealType][meal.Date.getDay()].findIndex(
         (m) => m.MealId === meal.MealId
       );
 
