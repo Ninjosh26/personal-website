@@ -1,0 +1,74 @@
+.meal-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 200px);
+  overflow-x: visible;
+  overflow-y: hidden;
+  height: "100%";
+  width: 70vw;
+}
+
+.header-row {
+  display: contents; /* Use contents to apply grid layout for headers */
+}
+
+.header-cell {
+  background-color: #333;
+  color: white;
+  text-align: center;
+  font-weight: bold;
+  padding: 10px;
+  border: 1px solid #ccc;
+}
+
+.navigation {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.row {
+  display: contents;
+}
+
+.cell {
+  background-color: #fff;
+  border: 1px solid #ccc;
+  text-align: center;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.row-header {
+  background-color: #333;
+  font-weight: bold;
+  text-align: center;
+  position: sticky;
+  left: 0;
+  z-index: 1;
+}
+
+.highlight-header {
+  border: 1px solid #ffd700;
+  background-color: #46443e;
+}
+
+.highlight {
+  background-color: #fffae6;
+  border: 1px solid #ffd700;
+}
+
+.disabled {
+  background-color: #e2dfdf;
+  pointer-events: none;
+}
+
+.droppable {
+  min-height: 100px;
+  width: 100%;
+  justify-items: center;
+}

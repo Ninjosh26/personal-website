@@ -11,6 +11,9 @@ export default function Navbar() {
       <div className="navbar-right">
         <ul className="nav-links">
           <li>
+            <a href="/meal-planner">Meal Planner</a>
+          </li>
+          <li>
             <a href="/activities">Activity Choices</a>
           </li>
         </ul>

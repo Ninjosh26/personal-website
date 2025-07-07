@@ -10,6 +10,11 @@ const port = process.env.PORT || 5000; // Default to port 5000
 app.use(cors()); // Enable Cross-Origin Resource Sharing
 app.use(express.json()); // Parse JSON bodies
 
+// Health check route
+app.get("/health", (req, res) => {
+  res.send("Backend is running");
+});
+
 // Route to get Movies
 app.get("/api/movies", async (req, res) => {
   try {
