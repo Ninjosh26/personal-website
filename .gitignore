@@ -16,3 +16,13 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .eslintcache
+
+# Backend static asset output (copied from frontend build)
+backend/public/
+
+# Prisma local SQLite dev databases
+backend/prisma/*.db
+backend/prisma/*.db-journal
+
+# TypeScript incremental build cache
+*.tsbuildinfo
